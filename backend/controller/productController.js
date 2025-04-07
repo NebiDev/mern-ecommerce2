@@ -88,3 +88,54 @@ export const getSingleProduct = handleAsyncError(async (req, res, next) => {
         product,
     });
 });
+
+//  creating and updating product reviews
+export const createProductReview = handleAsyncError(async (req, res, next) => {
+    const { rating, comment, productId } = req.body;
+    const review = {
+        user: req.user._id,
+        name: req.user.name,
+        rating: Number(rating),
+        comment,
+    };
+    const product = await Product.findById(productId);
+    if (!product) {
+        return next(new HandleError("Product not found", 404));
+    }
+    const isReviewed = product.reviews.find((rev) => rev.user.toString() === req.user._id.toString());
+    if (isReviewed) {
+        product.reviews.forEach((rev) => {
+            if (rev.user.toString() === req.user._id.toString()) {
+                rev.rating = rating, 
+                rev.comment = comment;
+            }
+        });
+    } else {
+        product.reviews.push(review);
+        product.numOfReviews = product.reviews.length;
+    }
+    let avgRating = 0;
+    product.reviews.forEach((rev) => {
+        avgRating += rev.rating;
+    });
+    product.ratings = product.reviews.length === 0 ? 0 : avgRating / product.reviews.length;
+    await product.save({ validateBeforeSave: false });
+    res.status(200).json({
+        success: true,
+        message: "Review added successfully",
+        product,
+    });
+});
+
+// admin get all products
+export const getAdminProducts = handleAsyncError(async (req, res, next) => {
+    const products = await Product.find();
+    if (!products || products.length === 0) {
+        return next(new HandleError("No products found", 404));
+    }
+    res.status(200).json({
+        success: true,
+        count: products.length,
+        products,
+    });
+});
