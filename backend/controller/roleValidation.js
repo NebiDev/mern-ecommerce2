@@ -1,3 +1,6 @@
+//the code below is to be used in the user controller to update the user role
+//the component will be deleted after the role is updated
+
 export const updateUserRole = handleAsyncError(async (req, res, next) => {
     const { role } = req.body;
 
