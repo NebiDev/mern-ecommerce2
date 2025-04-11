@@ -23,12 +23,23 @@ function Products() {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  
 
   const searchParams = new URLSearchParams(location.search);
   const keyword = searchParams.get('keyword') || '';
+  const category = searchParams.get('category') || '';
   const pageFromURL = parseInt(searchParams.get('page'), 10) || 1;
 
   const [currentPage, setCurrentPage] = useState(pageFromURL);
+  const catagories = [
+    'Electronics',
+    'Books',
+    'Men’s Clothing',
+    'Women’s Clothing',
+    'Footwear',
+    'Accessories',
+    'Home Appliances',
+  ]; 
 
   // 🧠 Keep state in sync with URL when navigating via back/forward buttons
   useEffect(() => {
@@ -40,9 +51,9 @@ function Products() {
 
   // 🚀 Fetch products when keyword or page changes
   useEffect(() => {
-    dispatch(getProduct({ keyword, page: currentPage }));
+    dispatch(getProduct({ keyword, page: currentPage, category }));
     window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on page change
-  }, [dispatch, keyword, currentPage]);
+  }, [dispatch, keyword, currentPage, category]);
 
   // ⚠️ Show error toast if needed
   useEffect(() => {
@@ -67,6 +78,17 @@ function Products() {
     }
   };
 
+  // 🔄 Handle category change + URL sync
+  const handleCategoryChange = (category) => {
+    const newSearchParams = new URLSearchParams(location.search);
+    if (category === 'All') {
+      newSearchParams.delete('category');
+    } else {
+      newSearchParams.set('category', category);
+    }
+    navigate(`?${newSearchParams.toString()}`);
+  };
+
   if (loading) return <Loader />;
 
   return (
@@ -76,6 +98,25 @@ function Products() {
         <div className="filter-section">
           <h3 className="filter-heading">Categories</h3>
           {/* Render category filters here */}
+          <ul>
+            {catagories.map((category) => (
+              <li 
+                key={category}
+                onClick={() => {handleCategoryChange(category)}
+                   }
+                >
+              
+                  
+                  
+                
+                  {category}
+                
+              </li>
+            ))}
+          </ul>
+          
+          
+
         </div>
 
         <div className="products-section">
