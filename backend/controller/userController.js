@@ -4,6 +4,7 @@ import HandleError from "../utils/handleError.js";
 import { sendToken } from "../jwtToken.js";
 import {sendEmail} from "../utils/sendEmail.js";
 import crypto from "crypto";
+import {v2 as cloudinary} from "cloudinary";
 
 
 
@@ -11,18 +12,41 @@ import crypto from "crypto";
 // register user => /api/v1/register
 // POST
 export const registerUser = handleAsyncError(async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, avatar } = req.body;
+
+    if (!name || !email || !password) {
+        return next(new HandleError('Name, email, and password are required', 400));
+    }
+
+    let avatarData = {
+        public_id: "default_avatar",
+        url: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&length=1`,
+      };
+      
+
+    if (avatar) {
+        const myCloud = await cloudinary.uploader.upload(avatar, {
+            folder: "avatars",
+            width: 150,
+            crop: "scale",
+        });
+
+        avatarData = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+        };
+    }
+
     const user = await User.create({
         name,
         email,
         password,
-        avatar: {
-            public_id: "sample id",
-            url: "sample url",
-        },
+        avatar: avatarData,
     });
+
     sendToken(user, res, `Welcome ${user.name}`, 201);    
-})
+});
+
 
 // login user => /api/v1/login
 // POST

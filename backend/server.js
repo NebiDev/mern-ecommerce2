@@ -1,4 +1,7 @@
 import dotenv from 'dotenv';
+import app from './app.js';
+import { connectMongoDB } from './config/db.js';
+import {v2 as cloudinary} from 'cloudinary';
 
 // Handle uncaught exceptions BEFORE anything else
 process.on('uncaughtException', (err) => {
@@ -11,8 +14,14 @@ process.on('uncaughtException', (err) => {
 // Load environment variables
 dotenv.config();
 
-import app from './app.js';
-import { connectMongoDB } from './config/db.js';
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
 
 // Connect to database
 connectMongoDB();

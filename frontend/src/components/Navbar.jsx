@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import MenuIcon from '@mui/icons-material/Menu';
-
+import { useSelector } from 'react-redux';
 import '../componentStyles/Navbar.css'
 import '../pageStyles/Search.css'
 import { Close } from '@mui/icons-material';
@@ -13,7 +13,7 @@ function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const isAuthenticated = true; // Replace with your authentication logic
+    const {isAuthenticated} = useSelector((state) => state.user)
     const navigate = useNavigate();
 
     const toggleMenu = () => {

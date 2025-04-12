@@ -1,17 +1,45 @@
-import {useState} from 'react'
-import { Link } from 'react-router-dom'
+import {useState, useEffect, use} from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import {toast} from 'react-toastify'
+import { useDispatch, useSelector } from 'react-redux'
+import { login, removeErrors, removeSuccess } from '../features/user/userSlice'
+import '../UserStyles/Form.css'
+
 
 function Login() {
     const [loginEmail, setLoginEmail] = useState('')
     const [loginPassword, setLoginPassword] = useState('')
+    const {loading, error, success, isAuthenticated} = useSelector((state) => state.user)
+
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
 
 
     const loginSubmitHandler = (e) => {
         e.preventDefault()
-        // Handle login logic here
-        console.log('Login submitted:', { loginEmail, loginPassword })
+        dispatch(login({email: loginEmail, password: loginPassword}))   
     }
+
+    useEffect(() => {
+        if(error) {
+            console.log('Error received:', error); // should be a string
+            toast.error(error)
+            dispatch(removeErrors())
+        }
+        if(success) {
+            toast.success('Login successful')
+            dispatch(removeSuccess())
+        }
+        if(isAuthenticated) {
+            navigate('/')
+        }
+    }, [dispatch, error, success, isAuthenticated, navigate])
+
+
+
+
 
   return (
     <div className='form-container '>

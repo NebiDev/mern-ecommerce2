@@ -104,10 +104,7 @@ function Products() {
                 key={category}
                 onClick={() => {handleCategoryChange(category)}
                    }
-                >
-              
-                  
-                  
+                >                  
                 
                   {category}
                 

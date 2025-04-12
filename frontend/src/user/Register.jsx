@@ -66,19 +66,23 @@ function Register() {
         e.preventDefault()
         if(!name || !email || !password  ) {
             toast.error('Please fill all fields')
-            return
+            return;
         }
 
         if(password.length < 6) {
             toast.error('Password should be at least 6 characters')
-            return
+            return;
         }
 
         const myFormData = new FormData()
         myFormData.set('name', name)
         myFormData.set('email', email)
         myFormData.set('password', password)
-        myFormData.set('avatar', avatar)
+          // ✅ Only include avatar if it exists
+           if (avatar) {
+           myFormData.set('avatar', avatar);
+           }
+        
 
         console.log(myFormData.entries())
         for (let entry of myFormData.entries()) {
@@ -145,7 +149,7 @@ function Register() {
                         />
                     <img src={avatarPreview} alt="Avatar Preview" className='avatar'/>
                 </div>
-                <button className="authBtn">Sign up</button>
+                <button className="authBtn"> { loading? 'Signing up' : 'Sign up'} </button>
                 <p className="form-links">
                     Already have an account? <Link to="/login">Login</Link>
                 </p>

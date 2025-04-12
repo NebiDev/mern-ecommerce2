@@ -16,7 +16,7 @@ export const createProducts= handleAsyncError(async(req, res, next) =>{
 })
 // get all products
 export const getAllProducts = handleAsyncError(async (req, res, next) => {
-    const resultPerPage = 3;
+    const resultPerPage = 4;
     const apiFeatures = new APIFunctionality(Product.find(), req.query).search().filter()
 
     // getting filter query before pagination
@@ -34,9 +34,9 @@ export const getAllProducts = handleAsyncError(async (req, res, next) => {
     apiFeatures.pagination(resultPerPage);
     const products = await apiFeatures.query;
 
-    if (!products || products.length === 0) {
-        return next(new HandleError("No products found", 404));
-    }
+    // if (!products || products.length === 0) {
+    //     return next(new HandleError("No products found", 404));
+    // }
 
     res.status(200).json({
         success: true,

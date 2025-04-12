@@ -3,37 +3,30 @@ class APIFunctionality {
         this.query = query;
         this.queryString = queryString;
     }
-    search() {
-        if (this.queryString.keyword) {
-          this.query = this.query.where('name').regex(new RegExp(this.queryString.keyword, 'i'));
-        }
+    search(){
+        const keyword = this.queryString.keyword ? {
+            name: {
+                $regex: this.queryString.keyword,
+                $options: 'i',
+            },
+        } : {};
+        this.query = this.query.find({ ...keyword });
         return this;
-      }
+
+    }
     
     // Filtering
 
     filter() {
         const queryObj = { ...this.queryString };
+        console.log(queryObj);
         const excludedFields = ['page', 'sort', 'limit', 'fields', 'keyword'];
         excludedFields.forEach((key) => delete queryObj[key]);
+        this.query = this.query.find(queryObj);
+        return this;   
       
-        // Object.entries(queryObj).forEach(([key, value]) => {
-        //   this.query = this.query.where(key).equals(value);
-        // });
-        Object.entries(queryObj).forEach(([key, value]) => {
-          if (key === 'category') {
-            // Case-insensitive match
-            this.query = this.query.where(key).regex(new RegExp(`^${value}$`, 'i'));
-          } else {
-            this.query = this.query.where(key).equals(value);
-          }
-        });
-        
-
-        
       
-        return this;
-      }
+    }
     
 
 
