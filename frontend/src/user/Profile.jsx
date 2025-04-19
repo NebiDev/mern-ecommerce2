@@ -14,12 +14,12 @@ function Profile() {
     <div className="profile-container">
       <PageTitle title={`${user.name} Profile`} />
 
-      <div className="profile-image-container">
-        <h1 className="profile-heading">My Profile</h1>
+      <div className="profile-image">
+        <h3 className="profile-heading">My Profile</h3>
         <img
           src={user?.avatar?.url || './images/profile.jpg'}
-          alt="Profile"
-          className="profile-avatar"
+          alt="User Profile"
+          className="profile-image"
         />
         <Link to="/profile/update">Edit Profile</Link>
       </div>

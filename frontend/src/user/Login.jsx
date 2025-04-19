@@ -24,7 +24,6 @@ function Login() {
 
     useEffect(() => {
         if(error) {
-            console.log('Error received:', error); // should be a string
             toast.error(error)
             dispatch(removeErrors())
         }

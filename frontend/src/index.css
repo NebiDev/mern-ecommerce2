@@ -9,7 +9,7 @@
     --primary-dark: #4E4A59; 
     --primary-light: #F8B5B1; 
     
-    --bg-primary: #2E2E3C; 
+    --bg-primary: #37442A; 
     --bg-secondary: #3B3B4F; 
     
     --text-primary: #EAE7E0; 
@@ -17,6 +17,7 @@
     --text-light: #FFFFFF; 
     
     --border-color: #5C4A6F; 
+    /* --border-color: #37442A;  */
     
 
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2); 

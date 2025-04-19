@@ -77,7 +77,7 @@ function Navbar() {
                         <span className="cart-badge">6</span>
                     </Link>
                 </div>
-               {!isAuthenticated && <Link to='/register' className='register-link' >
+               {!isAuthenticated && <Link to='/login' className='register-link' >
                      <PersonAddIcon className='icon' />
                 </Link>}
                 <div className="navbar-hamburger" onClick={toggleMenu}>  

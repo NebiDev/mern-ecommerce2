@@ -36,7 +36,7 @@ export const getProduct = createAsyncThunk(
       try {
         const link = `/api/v1/product/${id}`;
         const { data } = await axios.get(link); // Destructure data directly
-        console.log('Response', data);
+        // console.log('Response', data);
         return data; //  This is crucial
       } catch (error) {
         return rejectWithValue(
@@ -72,7 +72,7 @@ const productSlice = createSlice({
                 state.error = null;
             })
             .addCase(getProduct.fulfilled, (state, action) => {
-                console.log('Fulfilled action payload', action.payload);
+                // console.log('Fulfilled action payload', action.payload);
                 state.loading = false;
                 state.error = null;
                 state.products = action.payload.products;
@@ -93,7 +93,7 @@ const productSlice = createSlice({
                 state.error = null;
             })
             .addCase(getProductDetails.fulfilled, (state, action) => {
-                console.log('Fulfilled action payload', action.payload);
+                // console.log('Fulfilled action payload', action.payload);
                 state.loading = false;
                 state.error = null;
                 state.product = action.payload.product;
