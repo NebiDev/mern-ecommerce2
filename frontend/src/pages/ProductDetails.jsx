@@ -4,22 +4,33 @@ import PageTitle from '../components/PageTitle'
 
 import { Rating } from '@mui/material'
 import { useSelector, useDispatch } from 'react-redux'
-import { removeErrors, getProductDetails } from '../features/products/productSlice'
-import { useParams } from 'react-router-dom';
+import { removeErrors as removeProductErrors , getProductDetails } from '../features/products/productSlice'
+
+import {removeErrors as removeCartErrors,
+     removeMessages as removeCartMessages,
+     resetSuccess as resetCartSuccess, 
+     addItemsToCart } from '../features/cart/cartSlice'
+import { useParams, useNavigate  } from 'react-router-dom';
 import {toast} from 'react-toastify'
 import Loader from '../components/Loader'
 import PersonIcon from '@mui/icons-material/Person';
+import GoBackButton from '../components/GoBackButton';
+
+
 
 
 
 function ProductDetails() {
     const [userRating, setUserRating] = useState(0);
+    const [quantity, setQuantity] = useState(1);
+    const [review, setReview] = useState('');
 
     const handleRatingChange = (newRating) => {
         setUserRating(newRating);       
     }
 
     const { product, loading, error } = useSelector((state) => state.product);
+    const {loading: cartLoading, error: cartError, success, message, cartItems } = useSelector((state) => state.cart);
     const dispatch = useDispatch();
     const {id} = useParams();
 
@@ -28,28 +39,69 @@ function ProductDetails() {
             dispatch(getProductDetails(id));
         }
         return () => {
-            dispatch(removeErrors());
+            dispatch(removeProductErrors ());
         }
     }, [dispatch, id]);
 
         useEffect(() => {
             if (error) {
                 toast.error(error)
-                dispatch(removeErrors())
+                dispatch(removeProductErrors ())
+            }
+            if (cartError) {
+                toast.error(cartError)
+                dispatch(removeCartErrors())
+            }
+            if (success && message) {
+                toast.success(message)
+                dispatch(removeCartErrors());
+                dispatch(removeCartMessages())
+                dispatch(resetCartSuccess())
             }
         }
-        , [dispatch, error])
+        , [dispatch, error, cartError, success, message ]);
+
+        useEffect(() => {
+            console.log("Cart Items Updated:", cartItems);
+          }, [cartItems]);
+          
+
+
+    const increaseQuantity = () => {
+        if (quantity < product.stock) {
+            setQuantity(quantity + 1);
+        } else {
+            toast.error('Maximum stock limit reached');
+        }
+    };
+
+    const decreseQuantity = () => {
+        if (quantity > 1) {
+            setQuantity(quantity - 1);
+        } else {
+            toast.error('Minimum quantity is 1');
+        }
+    };
+
+    const addToCarthandler = () => {
+        console.log("Adding to cart: ", id, quantity);
+        dispatch(addItemsToCart({id, quantity}));
+        
+    }
 
         
+        
+        
+        
+        
+        
         if (loading || !product) return <Loader />;
-
-
-
 
   return (
     <>
     <PageTitle title={`${product.name}-details`} />
     <div className="product-details-container">
+        <GoBackButton fallback="/products" />
         <div className="product-detail-container">
             <div className="product-image-container">
                 <img src={product.image[0].url.replace('./', '/')} alt="product title"
@@ -79,14 +131,20 @@ function ProductDetails() {
                 {product.stock > 0 && (<>
                 <div className="quantity-controls">
                     <span className="quantity-label">Quantity: </span>
-                    <button className="quantity-button">-</button>
-                    <input type="number" className="quantity-value" value={1} readOnly />
-                    <button className="quantity-button">+</button>
+                    <button className="quantity-button" onClick={decreseQuantity} >-</button>
+                    <input type="number" className="quantity-value" value={quantity} readOnly />
+                    <button className="quantity-button" onClick={increaseQuantity} >+</button>
                 </div>
-                <button className="add-to-cart-btn">Add to Cart</button>
-                </>)}
-               
-                    
+                <button
+                    onClick={addToCarthandler} 
+                    className="add-to-cart-btn"
+                    disabled={cartLoading ? true : false}
+                    >
+                    {cartLoading ? 'Adding...' : 'Add to cart'}                       
+                </button>
+                </>
+            )}
+                                 
                     <form className="review-form">
                         <h3>Write a review</h3>
                         <Rating

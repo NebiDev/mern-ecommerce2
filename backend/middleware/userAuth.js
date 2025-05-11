@@ -5,6 +5,7 @@ import HandleError from "../utils/handleError.js";
 
 
 
+
 // checking if the user is logged in or not to access the protected routes
 export const verifyUserAuth =  handleAsyncError(async (req, res, next) => {
     const {token} = req.cookies;

@@ -5,6 +5,9 @@ import { sendToken } from "../jwtToken.js";
 import {sendEmail} from "../utils/sendEmail.js";
 import crypto from "crypto";
 import {v2 as cloudinary} from "cloudinary";
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 
 
@@ -104,7 +107,7 @@ export const requestPasswordReset = handleAsyncError(async (req, res, next) => {
         console.log(error);
         return next(new HandleError("Could not save reset TokenExpiredError, please try again later.",  500));       
     }
-    const resetPasswordURL = `http://localhost/api/v1/reset/${resetToken}`;
+    const resetPasswordURL = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`
     const message = `Use the following link to reset your password:\n\n ${resetPasswordURL}. \n\n This link will expire in 30 minutes. \n\n If you have not requested this email, then ignore it.`;
     try {
         await sendEmail({
@@ -143,26 +146,29 @@ export const resetPassword = handleAsyncError(async (req, res, next) => {
         return next(new HandleError("Reset Password Token is invalid or has expired", 400));
     }
 
-    const { password, confirmPassword } = req.body;
+    const { newPassword, confirmPassword } = req.body;
 
-    if (!password || !confirmPassword) {
+    if (!newPassword || !confirmPassword) {
         return next(new HandleError("Please provide both password and confirm password", 400));
     }
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
         return next(new HandleError("Passwords do not match", 400));
     }
 
-    if (password.length < 8) {
+    if (newPassword.length < 8) {
         return next(new HandleError("Password must be at least 8 characters long", 400));
     }
 
-    user.password = password;
+    user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    sendToken(user, res, "Password updated successfully", 200);
+    res.status(200).json({
+        success: true,
+        message: "Password updated successfully. You can now log in with your new password.",
+    });
 });
 
 // get user details => /api/v1/me
@@ -208,11 +214,28 @@ export const updatePassword = handleAsyncError(async (req, res, next) => {
 // update user profile => /api/v1/me/update
 // PUT
 export const updateProfile = handleAsyncError(async (req, res, next) => {
-    const { name, email } = req.body;
+    const { name, email, avatar} = req.body;
     const updatedUserData = {
         name,
         email,
     };
+    // if avatar is provided, upload it to cloudinary and update the user data, then delete the old avatar from cloudinary
+    if (avatar !== '') {
+        const user = await User.findById(req.user.id);
+        const imageId = user.avatar.public_id;
+        await cloudinary.uploader.destroy(imageId);
+        const myCloud = await cloudinary.uploader.upload(avatar, {
+            folder: "avatars",
+            width: 150,
+            crop: "scale",
+        });
+        updatedUserData.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+        };
+
+    }
+
     const user = await User.findByIdAndUpdate(req.user.id, updatedUserData, {
         new: true,
         runValidators: true,   
@@ -220,10 +243,56 @@ export const updateProfile = handleAsyncError(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: "Profile updated successfully",
-        user,
+        user
     });
 
 })
+
+
+// export const updateProfile = handleAsyncError(async (req, res, next) => {
+//     const { name, email } = req.body;
+  
+//     const updatedUserData = {
+//       name,
+//       email,
+//     };
+  
+//     // ✅ If avatar image is uploaded
+//     if (req.file) {
+//       // Convert file buffer to base64 string
+//       const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+  
+//       try {
+//         const uploadResult = await cloudinary.uploader.upload(base64Data, {
+//           folder: "avatars",
+//           width: 150,
+//           crop: "scale",
+//         });
+  
+//         updatedUserData.avatar = {
+//           public_id: uploadResult.public_id,
+//           url: uploadResult.secure_url,
+//         };
+//       } catch (err) {
+//         console.error("Cloudinary error:", err);
+//         return next(new HandleError("Avatar upload failed", 500));
+//       }
+//     }
+  
+//     // ✅ Update user with name/email (and avatar if provided)
+//     const user = await User.findByIdAndUpdate(req.user.id, updatedUserData, {
+//       new: true,
+//       runValidators: true,
+//     });
+  
+//     res.status(200).json({
+//       success: true,
+//       message: "Profile updated successfully",
+//       user,
+//     });
+//   });
+  
+  
 
 // admin getting user info => /api/v1/admin/users
 // GET

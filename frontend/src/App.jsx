@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react'
+import {  useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { loadUser } from './features/user/userSlice'
-import axios from 'axios';
 import './App.css'
 
-axios.defaults.withCredentials = true;
 
 // import components
 import Navbar from './components/Navbar'
@@ -24,6 +22,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import UpdatePassword from './user/UpdatePassword.jsx';
 import ForgotPassword from './user/ForgotPassword.jsx';
 import ResetPassword from './user/ResetPassword.jsx';
+import Cart from './cart/Cart.jsx'
 
 function App() {
   const {isAuthenticated, user} = useSelector((state) => state.user)
@@ -34,7 +33,7 @@ function App() {
     dispatch(loadUser());
   }, [dispatch]);
   
-  // console.log(isAuthenticated, user);
+
   
 
 
@@ -56,7 +55,8 @@ function App() {
             <Route path="/profile/update" element={<ProtectedRoute element={<UpdateProfile />} />} />
             <Route path="/password/update" element={<ProtectedRoute element={<UpdatePassword />} />} />
             <Route path="/password/forgot" element={<ForgotPassword />} />
-            <Route path="/password/reset/:token" element={<ResetPassword />} />
+            <Route path="/password/reset/:token" element={<ResetPassword />} />  
+            <Route path="/cart" element={<Cart />} />          
           </Routes>
           {isAuthenticated && <UserDashboard user={user} />}
           

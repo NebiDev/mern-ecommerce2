@@ -1,135 +1,169 @@
 
 import {createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import axiosInstance from '../../utils/axiosInstance';
+axios.defaults.withCredentials = true;
 
 
 
-// Register API
+
+//register API
 export const register = createAsyncThunk(
-  'user/register',
-  async (userData, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      };
-      const { data } = await axiosInstance.post('/api/v1/register', userData, config);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || 'Registration failed. Please try again.');
+    'user/register',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const config={
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+            const { data } = await axios.post('/api/v1/register', userData, config);
+            // console.log('Registration data', data)
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Registration failed. Please try again.');
+        }
     }
-  }
 );
 
-// Login API
+// login API
 export const login = createAsyncThunk(
-  'user/login',
-  async ({ email, password }, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-      };
-      const { data } = await axiosInstance.post('/api/v1/login', { email, password }, config);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Login failed. Please try again.');
+    'user/login',
+    async ({ email, password }, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.post('/api/v1/login', { email, password }, config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Login failed. Please try again.'
+        );
+      }
     }
-  }
-);
+  );
 
-
-// Load User API
+  //loadUser API
 export const loadUser = createAsyncThunk(
-  'user/loadUser',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axiosInstance.get('/api/v1/profile');
-      return data;
-    } catch (error) {
-      if (error.response?.status === 401) return rejectWithValue(null);
-      return rejectWithValue(error.response?.data?.error || 'Failed to load user. Please try again.');
+    'user/loadUser',
+    async (_, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.get('/api/v1/profile', config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Failed to load user. Please try again.'
+        );
+      }
     }
-  }
-);
+  );
 
-
-
-// Logout API
+//logout API
 export const logout = createAsyncThunk(
-  'user/logout',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axiosInstance.post('/api/v1/logout');
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Logout failed. Please try again.');
+    'user/logout',
+    async (_, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.post('/api/v1/logout', config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Logout failed. Please try again.'
+        );
+      }
     }
-  }
-);
+)
 
-// Update Profile API
+// update profile API
 export const updateProfile = createAsyncThunk(
-  'user/updateProfile',
-  async (userData, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-      };
-      const { data } = await axiosInstance.put('/api/v1/profile/update', userData, config);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to update profile. Please try again.');
+    'user/updateProfile',
+    async (userData, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.put('/api/v1/profile/update', userData, config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Failed to update profile. Please try again.'
+        );
+      }
     }
-  }
-);
+  );
 
-// Update Password API
+// update password API
 export const updatePassword = createAsyncThunk(
-  'user/updatePassword',
-  async (passwordData, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-      };
-      const { data } = await axiosInstance.put('/api/v1/password/update', passwordData, config);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to update password. Please try again.');
+    'user/updatePassword',
+    async (passwordData, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.put('/api/v1/password/update', passwordData, config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Failed to update password. Please try again.'
+        );
+      }
     }
-  }
-);
+  );
 
-// Forgot Password API
+// update forgot password API
 export const forgotPassword = createAsyncThunk(
-  'user/forgotPassword',
-  async (email, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-      };
-      const { data } = await axiosInstance.post('/api/v1/password/forgot', { email }, config);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to send password reset link. Please try again.');
+    'user/forgotPassword',
+    async (email, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.post('/api/v1/password/forgot', { email }, config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Failed to send password reset link. Please try again.'
+        );
+      }
     }
-  }
-);
+)
 
-// Reset Password API
+// update reset password API
 export const resetPassword = createAsyncThunk(
-  'user/resetPassword',
-  async ({ token, newPassword, confirmPassword }, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-      };
-      const { data } = await axiosInstance.put(`/api/v1/password/reset/${token}`, { newPassword, confirmPassword }, config);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to reset password. Please try again.');
+    'user/resetPassword',
+    async ({ token, newPassword, confirmPassword }, { rejectWithValue }) => {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        const { data } = await axios.put(`/api/v1/password/reset/${token}`, { newPassword, confirmPassword }, config);
+        return data;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.error || 'Failed to reset password. Please try again.'
+        );
+      }
     }
-  }
-);
+)
   
 
 
@@ -210,9 +244,9 @@ const userSlice = createSlice({
             })
             .addCase(loadUser.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload || 'Failed to load user';
                 state.user = null;
                 state.isAuthenticated = false;
-                state.error = action.payload || null;
             })
 
             // Logout
@@ -241,7 +275,6 @@ const userSlice = createSlice({
             .addCase(updateProfile.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.message = null; //prevent stale success messages
             })
             .addCase(updateProfile.fulfilled, (state, action) => {
                 state.loading = false;

@@ -1,5 +1,8 @@
 import {createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axiosInstance from '../../utils/axiosInstance';
+
 import axios from 'axios';
+
 
 export const getProduct = createAsyncThunk(
     'product/getProduct',
@@ -14,11 +17,8 @@ export const getProduct = createAsyncThunk(
         }
 
 
-
-        // const link = keyword?`/api/v1/products?keyword=${encodeURIComponent(keyword)}&page=${page}`:
-        // `/api/v1/products?page=${page}`;
         
-        const { data } = await axios.get(link); // Destructure data directly
+        const { data } = await axiosInstance.get(link); // Destructure data directly
         // console.log('Response', data);
         return data; //  This is crucial
       } catch (error) {
@@ -35,7 +35,7 @@ export const getProduct = createAsyncThunk(
     async (id, { rejectWithValue }) => {
       try {
         const link = `/api/v1/product/${id}`;
-        const { data } = await axios.get(link); // Destructure data directly
+        const { data } = await axiosInstance.get(link); // Destructure data directly
         // console.log('Response', data);
         return data; //  This is crucial
       } catch (error) {
